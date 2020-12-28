@@ -168,7 +168,7 @@ SELECT winner, subject FROM nobel
 SELECT name FROM world
   WHERE population > 
    (select population from world 
-     where name = 'Russia')
+     where name = 'Russia');
 
 --2
 
@@ -176,10 +176,66 @@ SELECT name FROM world
   WHERE continent =  'Europe' and
     gdp/population > 
     (select gdp/population from world 
-     where name = 'United Kingdom')
+     where name = 'United Kingdom');
 
 --3
 select name,continent from world
-where continent IN ((select continent from world where name = 'Argentina'),(select continent from world where name = 'Australia'))
+where continent IN ((select continent from world where name = 'Argentina'),(select continent from world where name = 'Australia'));
 
 order by name 
+
+-- 4
+select name, population from world
+where population > (select population from world where name = 'Canada') AND population < (select population from world where name = 'Poland');
+
+--5 
+
+select name, Concat(Round(population/(select population from world where name = 'Germany')*100,0),'%') AS '%_pop' from world
+where continent = 'Europe' ;
+
+--6
+select name from world where gdp > (select max(gdp) from world where continent = 'Europe') ;
+
+--7
+SELECT continent, name, area FROM world x
+  WHERE area >= ALL
+    (SELECT area FROM world y
+        WHERE y.continent=x.continent
+          AND area>0);
+
+
+--8
+select distinct continent,name from world x
+where name = (select name 
+from world y 
+where y.continent = x.continent
+order by name
+limit 1) ;
+
+--9 
+select name, continent, population from world x
+where 25000000> ALL(select population from world y where y.continent = x.continent);
+
+--10
+select name, continent from world x
+where population>=ALL(select population*3 from world y where y.continent = x.continent and population > 0 and y.name != x.name);
+
+
+--SUM AND COUNT
+
+--1 
+
+SELECT SUM(population)
+FROM worldl
+
+--2 
+
+select distinct continent from world;
+
+--3
+select sum(GDP) from world 
+where continent = 'Africa';
+
+--4 
+select count(name) from world 
+where area >= 1000000 
