@@ -333,3 +333,59 @@ SUM(case when teamid = team2 then 1 else 0 END) score2
 from game left join goal on id=matchid
 group by mdate,team1,team2
 order by mdate, matchid,team1,team2;
+
+
+--NULL
+
+--1
+
+select name from teacher where dept is NULL;
+
+--2
+SELECT teacher.name, dept.name
+ FROM teacher INNER JOIN dept
+           ON (teacher.dept=dept.id);
+
+--3
+SELECT teacher.name, dept.name
+ FROM teacher left JOIN dept
+           ON (teacher.dept=dept.id)
+
+--4
+SELECT teacher.name, dept.name
+ FROM teacher right JOIN dept
+           ON (teacher.dept=dept.id)
+
+--5
+SELECT name, COALESCE(mobile,'07986 444 2266') AS Contact
+  FROM teacher
+
+  --6
+  SELECT teacher.name, Coalesce(dept.name,'None')
+ FROM teacher left JOIN dept
+           ON (dept.id=teacher.dept)           
+
+--7
+select count(name),count(mobile)
+from teacher
+
+--8
+SELECT dept.name,count(teacher.name)
+ FROM teacher right JOIN dept
+           ON (teacher.dept=dept.id)
+group by dept.name
+
+--9
+select name,
+case when dept = '1' or dept = '2' then 'Sci'
+else 'Art'
+end as Dept
+from teacher 
+
+--10
+select name,
+case when dept = '1' or dept = '2' then 'Sci'
+when dept = '3' then 'Art'
+else 'None'
+end as Dept
+from teacher 
