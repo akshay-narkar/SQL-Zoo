@@ -354,33 +354,33 @@ SELECT teacher.name, dept.name
 --4
 SELECT teacher.name, dept.name
  FROM teacher right JOIN dept
-           ON (teacher.dept=dept.id)
+           ON (teacher.dept=dept.id);
 
 --5
 SELECT name, COALESCE(mobile,'07986 444 2266') AS Contact
-  FROM teacher
+  FROM teacher;
 
   --6
   SELECT teacher.name, Coalesce(dept.name,'None')
  FROM teacher left JOIN dept
-           ON (dept.id=teacher.dept)           
+           ON (dept.id=teacher.dept) ;          
 
 --7
 select count(name),count(mobile)
-from teacher
+from teacher;
 
 --8
 SELECT dept.name,count(teacher.name)
  FROM teacher right JOIN dept
            ON (teacher.dept=dept.id)
-group by dept.name
+group by dept.name;
 
 --9
 select name,
 case when dept = '1' or dept = '2' then 'Sci'
 else 'Art'
 end as Dept
-from teacher 
+from teacher ;
 
 --10
 select name,
@@ -388,4 +388,81 @@ case when dept = '1' or dept = '2' then 'Sci'
 when dept = '3' then 'Art'
 else 'None'
 end as Dept
-from teacher 
+from teacher ;
+
+
+--SELF JOIN
+
+--1
+select count(*)
+from stops;
+
+--2
+select id from stops 
+where name = 'Craiglockhart';
+
+--3
+select id,name from stops join route on id=stop
+where num = '4' and company = 'LRT';
+
+--4
+SELECT company, num, COUNT(*)
+FROM route WHERE stop=149 OR stop=53
+GROUP BY company, num
+Having Count(*) > 1;
+
+--5
+SELECT a.company,a.num,a.stop,b.stop
+FROM route a JOIN route b ON
+  (a.num = b.num )
+WHERE a.stop=53 and b.stop=149;
+
+--6
+SELECT x.company, x.num, stopa.name, stopb.name
+FROM route x JOIN route z ON
+  (x.num=z.num)
+  JOIN stops stopa ON (x.stop=stopa.id)
+  JOIN stops stopb ON (z.stop=stopb.id)
+WHERE stopa.name='Craiglockhart' and stopb.name = 'London Road';
+
+--7
+SELECT distinct a.company,a.num
+FROM route a JOIN route b on 
+(a.num = b.num)
+where a.stop = 115 and b.stop = 137
+
+--8
+SELECT distinct a.company,a.num
+FROM route a JOIN route b on 
+(a.num = b.num)
+join stops stopx on (a.stop=stopx.id)
+join stops stopy on (b.stop=stopy.id)
+
+where stopx.name = 'Craiglockhart' and stopy.name = 'Tollcross'
+
+--9
+SELECT distinct stopy.name,a.company,a.num
+FROM route a JOIN route b on 
+(a.num = b.num and a.company=b.company)
+join stops stopx on (a.stop=stopx.id)
+join stops stopy on (b.stop=stopy.id)
+
+where stopx.name = 'Craiglockhart' and a.company = 'LRT';
+
+--10
+
+ SET max_join_size=18446744073709551615;
+
+
+select  distinct a.num,a.company,stopy.name,c.num,c.company 
+from route a join route b on (a.num = b.num and a.company = b.company) join (route c join route d ON (c.num = d.num and c.company = d.company))
+
+
+join stops stopx on (a.stop=stopx.id)
+join stops stopy on (b.stop=stopy.id)
+join stops stopz on (c.stop=stopz.id)
+join stops stopq on (d.stop=stopq.id)
+
+where stopx.name = 'Craiglockhart' and stopq.name='Lochend' and stopy.name = stopz.name
+
+order by 1,length(stopy.name),c.company,stopy.name,c.num;
