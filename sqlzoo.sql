@@ -530,18 +530,18 @@ where stopx.name = 'Craiglockhart' and stopy.name = 'Tollcross'
 --9
 SELECT distinct stopy.name,a.company,a.num
 FROM route a JOIN route b on 
-(a.num = b.num and a.company=b.coselect title, actor from movie join casting on movie.id = movieid join actor on actor.id = actorid
+(a.num = b.num and a.company=b.company)
+join stops stopx on (a.stop=stopx.id)
+join stops stopy on (b.stop=stopy.id)
 
-where ord = 1 and 
-
-select movieid from casting join actor on actor.id = actorid where name = 'Julie Andrews'
+where stopx.name = 'Craiglockhart' and a.company = 'LRT';
 --10
 
 
  SET max_join_size=18446000;  --random number where the query works
 
 select  distinct a.num,a.company,stopy.name,c.num,c.company 
-from route a join route b on a.num = b.num and a.company = b.company join route c join route d ON c.num = d.num and c.company = d.company
+from route a join route b on a.num = b.num and a.company = b.company join route c join route d ON c.num = d.num and c.company = d.company;
 
 
 join stops stopx on (a.stop=stopx.id)
@@ -552,3 +552,103 @@ join stops stopq on (d.stop=stopq.id)
 where stopx.name = 'Craiglockhart' and stopq.name='Lochend' and stopy.name = stopz.name
 
 order by 1,length(stopy.name),c.company,stopy.name,c.num;
+
+
+
+
+-- WINDOW FUNCTION UK
+
+--1 
+
+SELECT lastName, party, votes
+  FROM ge
+ WHERE constituency = 'S14000024' AND yr = 2017
+ORDER BY votes DESC
+
+--2
+SELECT party, votes,
+       RANK() OVER (ORDER BY votes DESC) as Rank
+  FROM ge
+ WHERE constituency = 'S14000024' AND yr = 2017
+ORDER BY 1
+
+--3
+SELECT yr,party, votes,
+      RANK() OVER (PARTITION BY yr ORDER BY votes DESC) as posn
+  FROM ge
+ WHERE constituency = 'S14000021'
+ORDER BY party,yr
+
+--4
+SELECT constituency,party, votes,
+      RANK() OVER (PARTITION BY constituency ORDER BY votes DESC) as Rank
+  FROM ge
+ WHERE constituency BETWEEN 'S14000021' AND 'S14000026'
+   AND yr  = 2017
+ORDER BY rank, constituency 
+
+--5
+SELECT constituency,party
+  FROM ( select constituency,party,
+      RANK() OVER (PARTITION BY constituency ORDER BY votes DESC) as Rank
+  FROM ge WHERE constituency BETWEEN 'S14000021' AND 'S14000026'
+   AND yr  = 2017
+ORDER BY constituency,votes DESC
+) as new
+where new.Rank = 1
+
+
+--6
+select party,count(*) from (select constituency,party,
+      RANK() OVER (PARTITION BY constituency ORDER BY votes DESC) as Rank
+  FROM ge WHERE constituency Like'S%'
+   AND yr  = 2017
+ORDER BY constituency,votes DESC
+) AS X
+where X.rank = 1 
+group by party
+
+
+
+
+--NSS
+
+--1
+SELECT A_STRONGLY_AGREE
+  FROM nss
+ WHERE question='Q01'
+   AND institution='Edinburgh Napier University'
+   AND subject='(8) Computer Science'
+
+   --2
+
+   SELECT institution,subject
+  FROM nss
+ WHERE question='Q15' and 
+ score >= 100
+
+ --3
+ SELECT institution,score
+  FROM nss
+ WHERE question='Q15'
+   AND score < 50
+AND subject='(8) Computer Science'
+
+--4
+SELECT subject,SUM(response)
+  FROM nss
+ WHERE question='Q22'
+   AND (subject ='(H) Creative Arts and Design'
+   OR subject='(8) Computer Science')
+group by subject
+
+--5
+
+SELECT subject,sum((A_STRONGLY_AGREE*response)/100)
+  FROM nss
+ WHERE question='Q22'
+   AND  (subject='(H) Creative Arts and Design'
+   OR subject='(8) Computer Science')
+group by subject
+
+--6
