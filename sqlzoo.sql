@@ -335,6 +335,93 @@ group by mdate,team1,team2
 order by mdate, matchid,team1,team2;
 
 
+--- MORE JOINs
+
+--1
+SELECT id, title
+ FROM movie
+ WHERE yr=1962;
+
+ --2 
+select yr from movie 
+where title = 'Citizen Kane';
+
+ --3
+ select id,title,yr from movie where title like '%Star Trek%' order by yr;
+
+
+--4
+select id from actor where name = 'Glenn Close';
+
+--5 
+select id from movie where title = 'Casablanca';
+
+--6
+select name from actor join casting on actor.id = actorid
+ join movie on movieid=movie.id
+where movieid=11768;
+
+--7
+select name from actor join casting on actor.id = actorid
+ join movie on movieid=movie.id
+where title = 'Alien';
+
+--8
+
+select title from movie join casting on movieid=movie.id
+join actor on actor.id=actorid
+where name = 'Harrison Ford'
+
+--9
+
+select title from movie join casting on movieid=movie.id
+join actor on actor.id=actorid
+where name = 'Harrison Ford' and ord <> 1
+
+--10
+select title,name from movie join casting on movie.id = movieid
+join actor on actor.id = actorid 
+where yr = 1962 and ord = 1
+
+--11
+SELECT yr,COUNT(title) FROM
+  movie JOIN casting ON movie.id=movieid
+        JOIN actor   ON actorid=actor.id
+WHERE name='Rock Hudson'
+GROUP BY yr
+HAVING COUNT(title) > 2
+
+--12
+
+select title, name from movie join casting on movie.id = movieid join actor on actor.id = actorid
+
+where ord = 1 and movieid IN (select movieid from casting join actor on actor.id = actorid where name = 'Julie Andrews')
+
+--13
+
+select name from actor where 
+id IN 
+(select actorid from actor join casting on id = actorid where ord = 1
+group by actorid
+having count(actorid)>=15)
+order by 1
+
+--14
+
+select title,Count(actor.id) from movie join casting on movieid = movie.id
+join actor on actor.id = actorid
+where yr = 1978
+group by title
+order by 2 desc ,1
+
+--15
+
+
+select name from actor join casting on actor.id=actorid 
+where movieid IN (select movieid from casting join actor on actor.id=actorid where name ='Art Garfunkel') and name <> 'Art Garfunkel'
+
+
+
 --NULL
 
 --1
@@ -443,19 +530,18 @@ where stopx.name = 'Craiglockhart' and stopy.name = 'Tollcross'
 --9
 SELECT distinct stopy.name,a.company,a.num
 FROM route a JOIN route b on 
-(a.num = b.num and a.company=b.company)
-join stops stopx on (a.stop=stopx.id)
-join stops stopy on (b.stop=stopy.id)
+(a.num = b.num and a.company=b.coselect title, actor from movie join casting on movie.id = movieid join actor on actor.id = actorid
 
-where stopx.name = 'Craiglockhart' and a.company = 'LRT';
+where ord = 1 and 
 
+select movieid from casting join actor on actor.id = actorid where name = 'Julie Andrews'
 --10
 
- SET max_join_size=18446744073709551615;
 
+ SET max_join_size=18446000;  --random number where the query works
 
 select  distinct a.num,a.company,stopy.name,c.num,c.company 
-from route a join route b on (a.num = b.num and a.company = b.company) join (route c join route d ON (c.num = d.num and c.company = d.company))
+from route a join route b on a.num = b.num and a.company = b.company join route c join route d ON c.num = d.num and c.company = d.company
 
 
 join stops stopx on (a.stop=stopx.id)
