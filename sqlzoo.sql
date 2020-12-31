@@ -652,3 +652,33 @@ SELECT subject,sum((A_STRONGLY_AGREE*response)/100)
 group by subject
 
 --6
+
+SELECT subject,ROUND(
+SUM((response * A_STRONGLY_AGREE)/100) /
+SUM(response)*100
+)
+  FROM nss
+ WHERE question='Q22'
+   AND  (subject='(H) Creative Arts and Design'
+   OR subject='(8) Computer Science')
+group by subject
+
+--7
+SELECT institution,ROUND(
+SUM((response * score)/100)/ 
+SUM(response)*100 
+)
+  FROM nss
+ WHERE question='Q22'
+   AND institution like '%Manchester%'
+group by institution
+
+
+
+--8
+
+select institution, SUM(Sample),SUM(case when subject='(8) Computer Science' then sample end) as comp
+ from nss
+      WHERE question='Q01'
+      AND institution like '%Manchester%'
+      group by institution
